@@ -1,0 +1,23 @@
+# Test with Go
+
+Test With Go
+A Golang-centric testing tutorial
+Chapters 1-8
+
+18 Nov 2020
+
+Anthony Hauger
+hauger.anthony@gmail.com
+
+## What is testing, and why does it matter?
+
+* What is testing, and why does it matter?
+: TWG 1-6 are very go-centric and focuses strongly on different Golang conventions
+: I'll take a quick dive into the cool Golang things the "testing" package provides
+: Let's first talk about what a test is
+
+.image what-is-testing-and-what-does-it-do.jpg
+
+** What is a test?
+
+A test is a repeatable process that verifies whether something is working as intended.
