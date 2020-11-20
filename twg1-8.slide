@@ -1,23 +1,452 @@
-# Test with Go
+#Test With Go
 
 Test With Go
-A Golang-centric testing tutorial
-Chapters 1-8
-
-18 Nov 2020
+A Golang-centric testing tutorial, Chapters 1-8
+20 Nov 2020
 
 Anthony Hauger
 hauger.anthony@gmail.com
 
 ## What is testing, and why does it matter?
 
-* What is testing, and why does it matter?
+* 
 : TWG 1-6 are very go-centric and focuses strongly on different Golang conventions
 : I'll take a quick dive into the cool Golang things the "testing" package provides
 : Let's first talk about what a test is
 
 .image what-is-testing-and-what-does-it-do.jpg
 
-** What is a test?
+*What* *is* *a* *test?*
 
 A test is a repeatable process that verifies whether something is working as intended.
+
+* Why do tests matter?
+
+: So let's just run through some reasons why testing is important
+: Most of these I think you will know, others are fun because of Go
+
+Tests help find, fix, and prevent mistakes
+
+- Tests document expected behavior
+- May be a good method of documentation if you have a robust testing suite
+: If you're testing with JS, the Chai or Mocha library is really helpful as it's easy to read
+: and you can simiply point to the testing for documentation if you have enough testing (more about this later)
+: Go is fun in this regard because you can actually add testing to your documentation by writing example functions
+: Again, more on this later!
+
+* Why do tests matter?
+
+Tests encourage us to write better code
+
+- Encourages us to replicate weird behaviors
+- Encourages us to make small components to your functions
+: Let's say you have a bug in your code - Not only will testing help you isolate the root cause of the bug
+: but you can also just keep that test case to attempt to replicate that behavior
+: By being test focused, it's less likely that devs will generate large, unbroken, functions that can't easily be tested
+: You can easily create unit tests around functions that are broken up into smaller units
+: This will also allow your team to reuse code quickly
+
+* Why do tests matter?
+
+Tests can speed up development
+
+- Saves time by allowing testing to be done automatically vs. manually
+- Allows new and existing developers to make bigger changes and with the confidence that
+  changes won't take down the application.
+- Allows developer to go back to old code and understand the behaviors expected in order
+  to make minor or major changes
+: This last point is fairly self-explanatory and loops back to the idea of using testing as documentation
+
+* Writing Great Tests
+
+*Test* *with* *a* *purpose:* *Why* *am* *I* *writing* *this* *test?*
+
+Each test should have an explicit and obvious end goal.
+
+- Ex: "I introduced a bug"
+: As mentioned in the last slide, if you write a test to find the root cause of a bug
+: you can go ahead and fix the bug, but now you have a test to ensure the bug doesn't return
+- Ex: "I developed some new code"
+: Easiest reason, write some new code, write a unit test, integration test, or scenario test
+: to ensure it works as expected
+- Ex: "This code is really complex"
+: Write a test as a form of documentation of how to use that package, tool, or library
+: Again, Chai or Mocha is great for this, but Go allows you to toss that test into the 
+: documentation itself.
+
+* Writing Great Tests
+
+*Test* *with* *a* *purpose:* *Why* *am* *I* *writing* *this* *test?*
+Why do we want our tests to have purpose?
+
+- We don't usually test _how_ things happen
+: We usually don't test how things happen, just that they do.An example would be that
+: you may write a test to make sure an email gets sent out. You don't test the contents
+: of the email, or how its generated. Simply testing for the sake of testing would allow
+: for needless testing to be written, slowing down the development process. This is common
+: when testing is reversed engineered. Basically what we're doing now, writing tests after
+: the code is completed.Not necessarily anything wrong with what we're doing, just need
+: to take extra precaution when writing or reviewing testing
+- By testing how things happen, we are refactor resistant
+: This is a common thought for Test Driven Development. Develop the test before the function
+: is written. If you expand the code, the test should still pass since you tested how it worked,
+: not that it worked.
+- By testing how things happen, our tests won't *always* pass
+: The goal of testing isn't to pass the tests every time. Testing is to ensure your changes
+: don't take down production, or introduce bugs.
+
+* POP QUIZ
+.code popquiz/testThat.go
+: This is a really silly reason to write a test, but this will drive the point home. Is this
+: test testing how something works or that something works?
+: This test tests that something works
+
+* POP QUIZ
+.code popquiz/testHow.go
+: So now, does this test how or that?
+: This test tests how something happens
+
+* Writing Great Tests
+
+*Don't* *overdo* *it!*
+
+- The number of tests to write is arbitrary and varies from team to team
+: You don't want tests for every single solitary function you write. Purpose over coverage
+- Number of tests is determined by the severity of a bug in your code
+: You're going to want to write more tests for something that, if it fails, is going to cost 
+: you -- money, time, hair, scotch...If the code being written effects other services or will
+: be used to build code on top of, you may want more lines of test code per production code
+- What percentage of your code do you want covered by testing vs. uncovered?
+: 20% of your code being covered is not likely to be enough. 80% may be reaching "enough."
+: Again, depends on the team and depends on the needs.
+- Testing is a skill and skills evolve
+: Even experts change their opinion -- Google's blogs are a good example. Some people criticize
+: Google's blogs for not being able to "make up their mind" because opinions between experts vary
+: and opinions can evolve based on the scenario
+
+: Moral of the story: you are not going to be perfect.
+: You will write too many tests, tests with no purpose, tests that never fail, tests that are buggy
+: tests that fail frequently.
+
+* Tests are just Go code
+
+*Testing* *with* *a* *Main* *package*
+
+- Even if you have no knowledge of Go/<insert language here> testing is just verification to confirm
+  that the written code is working as intended
+: This is just a really long winded way of saying "You don't need to know a testing framework to do testing"
+: While testing frameworks may make things easier, it's not entirely necessary.
+
+.code justGo/golangTest.go
+
+* Testing with Go's testing package
+: I'm going to breeze through most of this section and the next section as it's not terribly important 
+: to those of us that don't work with Go daily. 
+*Ensure* *you* *import* *the* `"testing"` *package*
+
+*Naming* *files*
+
+- filename_test.go
+: By ending _test to the end of a file name, you're telling the go testing tool to build the
+: test files alongside your source files. Test files are not built with production code
+*Naming* *functions*
+
+- Written in PascalCase and start with Test
+: By starting the function with Test, you tell the testing tool to include this function as a 
+: test. Test has to be capitalized, but the rest of it could be snake_case or whatever
+- The test function's parameter must be of type *testing.X
+: There is testing.M and testing.T. Most often you will use testing.T. As far as I'm aware, you can
+: label the variable itself anything, so if you wanted to name it your pet's name go right ahead. It's
+: typically either m or t just to make things easier for everybody else.
+*DON'T* *PANIC*
+: Don't use Go's panic method when there is an error in the test, there are other ways to log errors in
+: the testing framework
+*What* *happens* *when* *we* *run* *go* *test?*
+: Magic. Just kidding, go test compiles and builds a binary in a temp directory that allows
+: it to run all these test cases.When the test finishes, this temp directory, file, and binary will remove
+: all these artifacts
+
+## Naming conventions
+* Naming conventions
+*File* *naming* *conventions*
+: Again, I'm going to breeze through this because, while it's important to Go devs, if you're working on
+: testing in any other environment it will not matter in the slightest to you and I'd like you all to
+: stay awake.
+- *Strict* *rule:* underscore test (*_test.go) is necessary for the test tool to build and include test files
+and functions for testing and to exclude test files when go build is run
+: We had covered this before, but there is no way around this.
+- *Convention:* There is a 1:1 correlation for file.go and file_test.go
+: You can add additional test files, like file_complex_test.go but generally a file will have a file_test
+- *Convention:* The source file test file is located in the same directory as the source file
+: This is the convention used out there in the world, but I personally don't see this as practical. Some of
+: our backend directories are pretty bulky as is, and if we are going to do unit testing, integration testing,
+: and scenario testing, our already husky directories are going to have to admit that they're fat.
+: John says there are other caveats, like how to access unexported variables, or internal tests, but that
+: wasn't covered in the sections I've done, so I'm uncertain of what that exactly means so I won't cover them
+: here.
+
+* Function Naming conventions
+- *Strict* *rule:* A test must be in the format of `func TestFunction(x *testing.X)`
+- *Convention:* When testing a method in a type, the test name is TestType_Method
+: And, similarly
+- *Convention:* When testing a function's specific use case, the test name is TestType_Method_usecase
+
+* Variable naming conventions
+: Here is where we can get environment independent. We can name our variables in whatever testing framework
+: To be as easy to understand as possible for devs looking into the tests; whether that is for documentation,
+: for test expansion, or for dev debug
+
+- When calling a function that receives a returned value, use 'got'
+- When you are expecting some data in particular, use 'want'
+- When calling a function with an expected argument, use 'arg'
+
+*
+: Let's tie all this together with an example
+.play dog/dog_test.go /^//START/,/^//END/
+
+## Failing Tests
+* Failing Tests
+
+* Ways to signal test failure
+: I'm not certain about other languages, but there is more than one way to signal test failure
+: There is of course simple logging to let devs know what's being run, when it's being run, etc.
+: Go has a formatted and an unformatted signal for most signals. Those are the commands with f at the end
+*Log* *and* *Logf*
+
+- These log messages will show up only when the test fails or passed -v
+*Fail* *and* *FailNow*
+: Fail and FailNow are interesting in that it marks the test as having failed
+: Fail and FailNow do not allow the developer to add a log message, so it's unlikely
+: You will see this in the wild
+- Fail allows test to continue, FailNow will stop the test immediately
+: Why use FailNow? Well, if you have a case where you can't get any further useful information
+: From a test if you Fail at that point, you would use FailNow to stop the test and find the bug
+*Fatal* *and* *Fatalf*
+
+- Log/Logf + FailNow
+: You're more likely to use Fatal instead of FailNow because Fatal will allow you to include error messages
+*Error* *and* *Errorf*
+
+- Log/Logf + Fail
+: Error and Errorf are simply a nice way to package two statements into one.
+
+* When to use Error vs. Fatal
+*Examples* *of* *when* *to* *use* *fatal:*
+
+- When setting up a test scenario
+: When you're creating request writers, creating the environment for a specific test to be able to run on
+- When expecting a particular response
+: Am I expecting a 200 response but received a 400? I could be testing that, when we're creating a user, the customer ID gets filled
+: If I get a 400 response, I'm going to end up accessing an invalid memory address. I'd want a Fatal in this case.
+- No data in a response body
+: Similarly, you can check that something in the response body exists so you don't access that invalid memory address
+
+* When to use Error vs. Fatal
+*Examples* *of* *when* *to* *use* *error:*
+
+- You didn't receive the correct conent _type_ from a response
+: Maybe you're expecting a certain type in your response header, or
+- Validating the expected response
+: the customer ID wasn't generated correctly. You'd use Error to test the specifics of the test.
+: The general rule of thumb is that, if I can get useful information by continuing the test? Then use Error.
+
+* Writing useful failure messages
+: As people who have used a C or C++ compiler, you understand the need for useful failure messages
+
+Here's some useful examples:
+
+- `t.Errorf("SomeFunc(%v)=%v;` `want` `%v",` `arg,` `got,` `want)`
+- `t.Errorf("SomeFunc(%v)` `want=%v;` `got=%v",` `arg,` `got,` `want)`
+: Why are these useful? It tells you what function caused the error, what argument was used to generate the error
+: What was expected and what was received.  The person debugging can now have an idea of where to look. You can expand that message if
+: You're expecting more than one value. For example, if you're expecting a quotient and a remainder: if the quotient or the remainder is
+: the cause of the error, you can explicitly say that in the error message
+
+* Writing useful failure messages
+
+*Pitfall!*
+_You_don't_want_too_much_information_in_your_error_messages!_
+
+- Print out subsets of objects, not a whole object
+: Let's say a payment method's ID may be a parameter. If the response isn't correct, we don't want to print out the 
+: entire payment method object or the entire response. That's going to really make your log messages difficult to read
+- Even if the tested function takes an entire object, it could be appropriate to only list the subsets used in the function
+: Similarly, if you're passing in a person object to check if the person's ID exists in the database, print that ID out as the arg
+: instead of the entire person object. From my experience, this is already being done, but sometimes gets lost in wrappers.
+
+*Convention:* `if `got` `!=` `want` translates to `SomeFunc()` `got;` `want`
+: This is obviously changable, but if you have it one way in your check, you can do it the same way in the error message to reduce 
+: time spent on decoding your error message
+
+# Example as test cases
+* Examples as test cases
+
+: Here's something really fun that Go does: you can write Example functions that are run as test cases but show up as examples in your documentation
+* A basic example as a test case
+
+.code exampleAsATest/basicExample.go
+
+: You can see up at the top that we import fmt and testing. We've got a HelloWorld function that takes in a string and returns a string.  Easy enough.
+: Now, when you make an example function, you can simply put // Output: to show other devs what that is used for.  This is great for complicated cases,
+: Or potentially even scenario testing.  One thing highlighted by John was if you have a complicated library and want to show the funcitonality, you can
+: Show that functionality in the documentation through example test functions. It's a two-fer.
+: Okay, but what happens when you're dealing with functions that return things in no particular order, like asynchronous functions? Easy: 
+: there's an // Unordered output: option.
+
+* Viewing examples in the docs
+
+- You can access your app's documentation in your browser!
+`godoc` `-http=:`<insert port number>
+
+- You can look at the packages you've imported as well as packages you've written
+: https://golang.org/pkg/sort/#example_Ints
+: https://golang.org/src/sort/example_interface_test.go
+: If there are examples written, you will see them underneath the named function!
+
+*You* *can* *even* *write* *examples* *for* *particular* *functions* *or* *use* *cases!*
+
+- `func` `ExampleDog_Bark` will show up under the `type Dog` -> `func(Dog)` `Bark`
+: So if you have a particular type you want to highlight, you can write an example for that, OR if you want to highlight a specific function of that type
+: You can use the naming conventions to highlight that in your documentations.
+: Some of the cases that John Highlights would fall under what we're calling Scenario testing.  For example, he wrote up an example of how to crop an image
+: with a library he created on his own.  By writing an example that takes you through the decode, then crop, then encode flow, you're showing users how that is done.
+: So if we write an example that shows how to register a device, log in a user, and create a customer, we can show that to onboarding devs or to devs that don't work
+: with the order calculator or the purchase flow
+
+# Testing Multiple Cases
+* Testing Multiple Cases (AKA Where the magic happens)
+
+* Table Driven Tests
+: What are table driven tests, and why would we use them? Well, let's answer both those questions at the same time by answering "why would we use them"
+- Writing multiple test functions to cover test cases
+*OR*
+: You could write multiple functions to cover multiple test cases. My Dog Bark and Dog Bark Spanish are good examples. I want to test that if our dog speaks Spanish
+: It says the write thing.  That's great, but under the DRY or Do Not Repeat Yourself idea and methodology, you end up writing a bunch of code that could is repeated
+: instead you could use a Table Driven Test!
+.code tdt/tdt_test.go
+: So what's going on in this code? You can see that we have declared our test function. Underneath we have a slice or array, mapping, list, etc...of structs. In Each
+: struct, we are going to have a name, an arg, and a want string. After telling the Go compiler what testCases is expecting, we are going ahead and adding those fields
+: to testCases. Then underneath we are cycling through all available test cases to do whatever testing we are aiming to accomplish. This seems like a lot of code for
+: something so trivial, and it is, but often you will see this kind of boilerplate code even with a singular test case. Why? Because if you ever find a bug or simply
+: want to expand testing, you can easily do that with this kind of setup. Now, you can see here that I'm using t.Errorf instead of Fatal. Why? Well, because we're not
+: using subtests, which will be covered in slide coming up, Fatal will stop all testing after that error shows up. So if you have five or ten different test cases
+: and the third one fails, your remaining test cases won't run at all. Error will give you that error message you're looking for but then move on to the next test case.
+: Subtests resolves this a little bit, but like I said we'll cover that more in a moment.
+
+: Show the CreatePerson PR
+
+* Generating table driven test code
+
+- You can generate boilerplate test cases in your text editor
+.link https://github.com/cweill/gotests
+: I don't know why I'm sharing this with you, because I'm allowing the robots to take my job.  Just kidding. You obviously have to write your own test cases and fill in the blanks
+: But this speeds up generating the boilerplate code.
+
+* Subtests
+: Subtests are great and opens up some really powerful stuff moving forward
+- Subtests are the `t.Run(name, `func(t` `*testing.T))` command
+: This may look like Greek, because it is. What you're saying is that, obviously you're giving your test a name so that it shows up in the logs when you run the test, but that you
+: are passing it a closure.  A closure, the best way I can describe it, is a nested function. JavaScript has something very very similar in its .map or .filter functions. You can
+: either pass in an arrow function, or you can give it a prebuilt function.  These closures are the same in that regard.
+- Example of a closure:
+.code dog/sub_test.go /^//START/,/^//END/
+: So this example shows you the t.Run command and what a closure looks like, it also shows you that you can use the Fatal command. Subtests allow you to use Fatal without stopping all the testing.
+: What Fatal will do, in this case, is stop the current test from continuing to run. This is useful for everything I mentioned before, and to help find a bug. If you're not receiving certain information
+: from a response under specific circumstances, you may want to continue running tests to show that it is behaving correctly otherwise, but want it to stop running if it's going to give you an invalid
+: memory address error.
+: Another fun thing about subtests is the ability to nest them.  If you wanted to run a test inside a test, you'd be able to do that.  It is also great to manage what tests run in parallel! Subtests
+: Allow you granular control over your tests.
+
+* Shared setup and teardown
+
+- Can setup objects or databases using helper functions or as setup before your tests/subtests or teardown after your tests
+: A really great way to use table driven test code is to use some helper functions to set up a particular scenario and run a bunch of tests based on that.  You can use subtests to run different
+: testing situations using non-exported functions. non-exported functions are in camelCase, or don't use capitalized letters for the start of the function name.
+
+.code tdt/helper_test.go
+
+* TestMain
+
+- `func` `TestMain(m` `*testing.M){}`
+: TestMain is a clever tool. What it allows you to do is set up everything and anything you may need to run your other testing cases. Examples include, databases, processes, objects...
+: The idea is you spool them up in the TestMain and all your other tests use that particular instance.
+- Can set flags here using flag.Parse()
+: Essentially can create your own flags here, so if you need to pass in command line arguments you can go ahead and set those here. Essentially argparse.
+- The only method testing.M has is m.Run()
+: If you take the time to write out a TestMain function, you must include a m.Run(). That is the only way your other tests will run. The test tool looks for TestMain and then executes the other
+: Test cases only if m.Run() is set. m.Run() returns the exit code, but doesn't necessarily need to be the final line in your code. If you have any functions set to deferred, meaning they will
+: run at the end of the parent function, and are typically set so you can close database connections or remove certain objects like test customers. However, the final line should be os.Exit with
+: m.Run's exit code. If you do have deferred functions, os.Exit will prevent them from running, so you'll have to make helper functions to get around this.
+- TestMain cannot return Fail signals
+: If something fails in the setup process in TestMain, you must insert a panic. Since Error and Fatal are a part of the T package, M doesn't recognize those signals.
+
+# Parallel Tests
+* Parallel Tests
+
+- *Why?*
+: Why would I want tests to run in parallel? You may want to ensure that your type is threadsafe, that it is safe to run in parallel. You may want to test that your webapp can handle multiple requests
+: As though it were in a real world scenario. This is important because you might end up encountering a race condition you didn't know existed or wouldn't know existed if you hadn't run testing in
+: parallel.
+- Parallelism is not "free"
+: Not only is it more computationally intense, but it takes more time to setup. For instance, you can't necessarily use hard coded values, you have to abstract things and use interfaces or FUNCTORS! :D
+: Another potential problem is that multiple tests may try to manipulate the same image at the same time. You may have a database that can't handle concurrent connections. Paralellism isn't "free."
+
+*Tests* *that* *are* *marked* *as* *parallel* *will* *only* *run* *with* *other* *tests* *that* *are* *marked* *as* *parallel!*
+
+- The way Parallel() works is by putting tagged tests in queue
+: Once Parallel() is called in the function, that function is paused and put into a queue with other tests marked as parallel. This is different than simply being tagged as parallel as, say, a type.
+: What I mean is if you don't have Parallel at the top line of your function or your subtest, spoiler alert, the proceeding code will run. So if you're certain that's what you want to do, go do it.
+: You may run into weird errors if you don't. Once the tagged test is paused, the non-parallel tests will run first, then the parallel test will run in parallel!
+- Avoid running tests in parallel for the sake of running tests in parallel
+: The speed boost associated with running things in parallel, especially if you have a bunch of really quick tests, is really tempting. The problem is that race conditions may occur that have nothing
+: to do with the functionality of the test or the case being tested. This is another cost of parallel testing.
+
+*
+.code parallel/parallel_test.go
+
+* Parallel Subtests!
+: If you hadn't guessed from what I said earlier, you can make subtests run in parallel
+: This can get really tricky, but allows you lots of control over what tests do and do not run in parallel
+- If the parent test isn't marked as parallel, the test will run until the subtest is marked as parallel
+: I have an example of this to show you, but you can go ahead and create a bunch of test cases before you call t.Run or setup your database, or or or, and then have the test pause to be run in parallel
+- Deferred functions treat parallel subtests as having completed when paused
+: Again, I have an example, but these deferred functions or calls to close databases, other connections, will be called before the test is put on pause. So if you are waiting to close a connection, you
+: will have to work around that.  The work around is to wrap your parallel subtests in a subtest. The inner subtest will be paused, but the outter subtest won't be marked as complete until the inner tests
+: complete. Weird, but you've got all the control!
+
+*
+.code parallel/parallel_sub_test.go
+
+* Gotchas with closures and parallel tests
+: There are a few fun gotchas that are easy enough to get around
+- Incrementors will end up using the most incremented value!
+: Things like i in a for loop is called by reference and not by value. So you could name your test i and it would show as 1-10, but when you run a test using i it will only equal 10.
+: Why is this important to know? If you're looping over your test cases, for example, your test names will look like you expect, but you will only run the final test test number of times.
+: So if that final test passes, it could look like ALL your tests passed.
+*Ways* *to* *get* *around* *this:*
+
+- Easy mode: create local variables inside the for loop or inside t.Run() _as_ _long_ _as_ _its_ _before_ _t.Parallel_
+: By copying the local variables, you trade ease and convenience for confusion. You can put a comment to the side that says "DON'T DELETE THIS IT WILL BREAK EVERYTHING!"
+- Expert mode: Create a closure that takes a struct as a parameter and returns the original closure from t.Run. Then pass that closure tc.
+: So, you know, you could be 1337 H4><0R5, or you could just do it the easy way.
+
+* Testing Race Conditions
+.link https://blog.golang.org/race-detector Blog post about the race flag
+
+- You can add the -race flag to many go commands
+: The race flag can be added to things like go test, go run, go get...you go get the idea
+: What the race flag does is search local memory as the compiler is building the code and checks for potential race conditions
+: What it doesn't do is be able to determine things like database read/write race conditions.  Since that's not stored in local
+: memory, the flag won't be able to detect it on its own.
+.image Bubba-race_flag.jpg
+
+* Testing Race Conditions
+
+- Cumbersome
+- Requires devs to make functions modular, or refactor code to be modular
+: Testing for race conditions isn't impossible, but it's somewhat difficult. If you're not building your code originally to be set up for this kind of testing
+: it might take quite a bit of time refactoring to allow for it. Basically what John was saying is that you're going to have to pass interfaces into the functions
+: that are under test. Honestly I didn't quite understand it, so its something I'm going to have to keep an eye out for and do some more research about ways to take
+: on testing for race conditions.
+
+* TUH DUH!
